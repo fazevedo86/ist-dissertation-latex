@@ -5,12 +5,29 @@
 % Set the page style to show the page number
 \thispagestyle{plain}
 \abstractEnglishPageNumber
-Your abstract goes here.
-
+% Problem statement
+Today's computer network environments are in essence a complex device-centric web, made out of thousands of autonomous devices - network nodes - and connections in between them through which the said nodes communicate with each other by means of communication protocols.
+The result is a highly inflexible infrastructure that is hard to manage, maintain and evolve. 
+In order to modify the behavior of today's network these nodes have to be manually configured in a vendor specific manner, which renders the introduction of modifications slow, prone to Human error and dependent on the vendor's implementation of the protocols.
+The recent server virtualization trend has made the data center a much more dynamic environment by effectively increasing the number of computing instances that have different and changing network requirements, resulting in an increased pressure on data center network management not only for network availability but security and scalability as well, specially when we consider multi-tenant data center environments.\\
+% What is SDN & OF
+\emph{Software-Defined Networking}, along with its most prominent supporting protocol - \emph{OpenFlow} -, presents itself as a new paradigm capable of solving the aforementioned issues by means of separating the data forwarding logic from the control logic and allowing for a logically centralized, standardized, programmable network management interface.
+SDN relies essentially on the decoupling of the \emph{control plane} from the \emph{data plane}, placing the former in a logically centralized component to be executed on commodity hardware - the \emph{SDN Controller}.\\
+% How OF works & associated limitations
+The OpenFlow protocol features proactive and reactive programming.
+The proactive mode is based on static programming of the data plane.
+Reactive programming enables the programming of the network based on real-time decisions taken as new traffic hits the data plane, but it requires the first packet of every new flow traversing any SDN controlled network node to be sent to the controller and evaluated.
+The proper action is then programmed in the device, and the packet is sent back to the data plane.
+While reactive mode offers a much more convenient and flexible method to program the network when compared with proactive mode, the inherent computational cost of performing the associated tasks in large networks becomes too large to be handled by a single SDN Controller instance.
+One way to overcome this limitation is to have several SDN Controller instances running separately, each one handling a subset of network devices.
+However, this solution requires  a complex and cumbersome configuration of both SDN controllers and OpenFlow devices in order to keep consistent network rules and efficient load sharing across controllers.\\
+% Our solution
+In order to make the most out of OpenFlow's potential, a new architecture for OpenFlow SDN controllers has been developed, centered on the concept of elastic SDN Controller clustering and anycast communication paradigm.
+The proposed architecture offers both load balance between different SDN controller instances and a resilient infrastructure to deal with the loss of any single controller, allowing for a scalable use of reactive flow programming. 
 % Keywords
 \begin{flushleft}
 
-\keywords{my keywords}
+\keywords{Software-Defined Networking, OpenFlow, Network Function Virtualization, Network Management, Distributed SDN Controller}
 
 \end{flushleft}
 
