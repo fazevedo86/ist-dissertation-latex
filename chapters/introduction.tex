@@ -2,14 +2,54 @@
 
 \chapter{Introduction}
 \label{chapter:introduction}
-Your introduction here...\\
-
-A demonstration of how to use acronyms and glossary:
-
-A \gls{MSc} entry.
-
-Second use: \gls{IST}.
-
-Plurals: \glspl{MSc}.
-
-A citation example \cite{nobody}
+% Traditional network paradigm & management problem
+Today's computer networks are essentially sets of interconnected network nodes. 
+These nodes are mainly proprietary black boxes that allow for data input/output, exposing a configuration interface through which network operators can configure its behavior by means of a vendor specific configuration workflow and interface.
+These black boxes are typically switches and routers that implement in software and/or hardware a set of standard or proprietary protocols that allow them to communicate with each other and provide service to the endpoints logically or physically connected to them.
+Because the process of creating and implementing new protocols requires a long period of time, and due to the complex dependency between multiple protocols running on the same node, new network features have typically been implemented resorting to middle boxes designed to perform specific functions such as Firewalls, \glspl{IDS} and \gls{WAN} optimizers, thus effectively increasing the overall complexity and in turn further aggravating the network manageability issue at hand.\\
+%
+% IT virtualization adding pressure
+This has held true for the last couple of decades and is now an increasingly focus of attentions due to the recent trend of \gls{IT} virtualization trend, that has changed the typical data center environment drastically, with the number of virtual network ports surpassing that of physical network ports and the amount of virtual servers largely exceeding the number of physical servers\cite{Kreutz2014}.
+However, \gls{IT} virtualization has a much deeper impact on the data center network infrastructure than the mere increase of network ports and hosts.
+With today's \gls{IT} virtualization technology, the creation, removal and relocation of \glspl{VM} between physical hosts are trivial operations thus allowing for the concept of \gls{IaaS} to emerge, which in turn allows for the creation of elastic computing services\cite{Kreutz2014} such as Amazon Elastic Compute Cloud (Amazon EC2)\cite{AmazonEC2}.
+The \gls{IT} virtualization operations supporting \gls{IaaS} can be performed in a matter of minutes, however the network infrastructure must be reconfigured as well to support the changes being made to the environment, and it must be done manually and often node by node, taking hours or even days to do so.\\
+%
+% Existing virtualization solutions & associated problems
+Current networking concepts already introduced virtualization mechanisms, such as \gls{MPLS} for path virtualization, \gls{VLAN} for layer 2 virtualization and \gls{NAT} and \gls{VRF} for layer 3 virtualization\cite{Kreutz2014}, however, these solutions are still device-centric and therefore still require configuration to be performed node by node through the same vendor specific workflows and interfaces, meaning that there is still no global network view nor global network configuration\cite{Kreutz2014} and in some cases these mechanisms are no longer able to cope with the high density of compute instances introduced by \gls{IT} virtualization \cite{Duffy2012} thus leaving the task of network reconfiguration to still require a large amount of time, be error prone and in some cases ineffective.
+As a result, networks are now the technological bottleneck that is dragging the operational workload and hindering innovation in \gls{IT}, with heavy focus on data center environments.
+To that extent a new network management model is now required, one that can cope with the requirements now being set while also being future proof.\\
+%
+% New generation solutions
+In order to solve these issues two new concepts arose in the past couple of years, \glspl{SDN} and \gls{NFV}.
+These two concepts share some core concerns, such as the use of commodity hardware to implement network features, but they both aim at different goals, being considered to be complementary but not dependent on each other\cite{ETSI2014,Pate2013}.\\
+%
+% NFV
+\gls{NFV} was proposed by the \gls{ETSI} and stems from \gls{IT} virtualization itself, proposing the virtualization of entire network node classes, such as Firewalls, Routers and \glspl{IDS}, using commodity hardware as the underlying physical infrastructure.
+This concept results in the dismissal of function-specific hardware middle boxes by means of virtualization, thus easing the physical constrains of adding new features to the network, as new instances of virtualized nodes can be deployed using existing commodity hardware already in place in different regions of the network\cite{ETSI2014}.
+This means that at core, \gls{NFV} attempts to improve the scalability of current networks by removing some of the hardware complexity and cost but leaves the global network manageability issue yet to be solved.\\
+%
+% SDN
+The current notion of \gls{SDN} was developed in Stanford University while researching for a network configuration protocol, from which resulted OpenFlow, and is a concept that keeps gaining momentum both on the academic and business environments.
+\gls{SDN} refers to the architectural principles while OpenFlow is an implementation of a supporting protocol for the said architecture.
+\gls{SDN} relies essentially on the decoupling of the control plane from the data plane, placing the former in a logically centralized component to be executed on commodity hardware - the \gls{SDN} Controller.\\
+%
+% OF
+OpenFlow, being a protocol that implements \gls{SDN}, allows for network programmability in a flow-oriented fashion through a well-defined \gls{API}, providing two different approaches to do so: proactive and reactive flow programming.
+While both approaches can be used simultaneously, there is a lot to be gained from the latter, which provides a mechanism to program the network to forward data based on real-time decisions taken as traffic hits the data plane, while the former provides a mean for static network programming before traffic reaches the data plane.
+The reactive approach, however, has a much higher computational cost when compared to the proactive approach, since for every new traffic flow traversing the network controlled by a given \gls{SDN} controller the first packet of such flow must be sent from the OpenFlow switch receiving it to the \gls{SDN} Controller, have the \gls{SDN} controller evaluate the packet, determine appropriate action, program the OpenFlow switch accordingly, and then forward the packet back into the data plane.\\
+%
+% OF Problems
+When applied to large scale networks, the inherent computational cost of performing the aforementioned tasks becomes far too high to be handled by a single \gls{SDN} controller instance.
+One way to overcome this limitation is to have several \gls{SDN} controller instances running separately, each handling a subset of the OpenFlow switch set.
+However, this approach cannot be easily implemented since network policies would have to be explicitly configured on each and every \gls{SDN} controller, it is susceptible to \gls{SDN} controller failures, requires a complex and cumbersome configuration of the OpenFlow switches or alternatively a mechanism of coordination between the instances of the \gls{SDN} controller in order to ensure equal load sharing across \gls{SDN} controllers.
+Finally, for any given flow traversing multiple OpenFlow switches controlled by different \gls{SDN} controllers instances the aforementioned process would have to be executed on each \gls{SDN} controller instance involved.\\
+%
+\section{Objectives}
+It is the goal of this work to propose a new architecture for OpenFlow-based \gls{SDN} controllers that offers both load balance between different \gls{SDN} controller instances and a resilient infrastructure, which enables for a scalable use of reactive flow programming regardlessly of the network size.
+This new architecture does so by relying on two key concepts: the clustering of \gls{SDN} controllers and the introduction of a load balancing layer.
+The clustering mechanism takes the notion of the \gls{SDN} controller as a logically centralized component and introduces the concept of \emph{elastic \gls{SDN} controller clustering}, implementing the mechanisms necessary to scale out the \gls{SDN} controller as needed and in real time by providing means to add and remove \gls{SDN} controller instances from the cluster as needed with negligible or no service disruption.
+The load balancing layer, which is also executed on commodity hardware, is logically situated between the OpenFlow switches and the SDN Controllers, acting as a level of indirection that assigns a controller to each OpenFlow switch in a consistent fashion that insures an equal distribution of OpenFlow switches across available SDN controller instances.\\
+%
+% DOC OVERVIEW
+\section{Document structure}
+This document is composed of 6 chapters arranged as follows: Chapter \ref{chapters/state-of-the-art} covers the state of the art regarding \gls{SDN} and OpenFlow; Chapter \ref{chapter:architecture} describes the proposed architecture; Chapter \ref{chapter:implementation} cover the implementation details of the architecture and strategies used; Chapter \ref{chapter:evaluation} presents the results obtained by testing the resulting implementation; Chapter \ref{chapter:conclusion} summarizes the work developed, the problems identified and future work.
