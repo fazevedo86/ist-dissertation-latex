@@ -29,7 +29,7 @@ The policies are then applied to the appropriate network nodes by the \emph{Dist
 These two core concepts lead to the definition of the architecture of \gls{SDN} in three layers, the \emph{Application} layer, the \emph{Control} layer and the \emph{Infrastructure} layer \cite{OpenNetworkingFoundation,Kreutz2014} as depicted in Figure \ref{fig:SDN_Architecture}.
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.8]{SDN_Architecture}
+	\includegraphics[scale=0.70]{SDN_Architecture}
 	\caption{Two node network according to the SDN architecture.}
 	\label{fig:SDN_Architecture}
 \end{figure}
@@ -143,6 +143,14 @@ Consequently, network protocol implementations on network elements become increa
 \subsection{OpenFlow flow programming}
 \label{subsection:openflow-flow-programming}
 % Static vs Dynamic flows
+%
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.65]{OF_dynamic_flow_programming}
+	\caption{OpenFlow reactive flow programming}
+	\label{fig:OF_dynamic_flow_programming}
+\end{figure}
+%
 \gls{SDN} controllers may program flow entries in OpenFlow switches by issuing \emph{flow table modification} messages.
 These messages allow the \gls{SDN} controller to manipulate flow tables by adding new flow entries and modifying or removing existing flow entries.
 Flow entry additions performed by the \gls{SDN} controller by issuing a flow table modification message to predefine the forwarding behavior ahead of data transmission is referred to as static flow entries and configures the proactive flow programming paradigm.
@@ -154,13 +162,6 @@ A typical usage of static flow entries are the table-miss flow entries, which ha
 %
 Table-miss flow entries, defining an instruction to forward the packet to the \gls{SDN} controller through a \emph{packet-in} message, on the other hand enable the \gls{SDN} controller to examine the packet and define the proper actions to be executed by the switch in a reactive fashion.
 The \gls{SDN} controller may respond to this message with either a \emph{packet-out} message defining the actions to be executed exclusively for that packet or alternatively with a flow table modification message that will create a new flow entry to handle all the packets matching that flow, including the original packet included in the packet-in message\cite{OF13}, as depicted in figure \ref{fig:OF_dynamic_flow_programming}.
-%
-\begin{figure}
-	\centering
-	\includegraphics[scale=0.65]{OF_dynamic_flow_programming}
-	\caption{OpenFlow reactive flow programming}
-	\label{fig:OF_dynamic_flow_programming}
-\end{figure}
 %
 The resulting flow entries are referred to as \emph{dynamic flow entries}, and it is one of the most powerful features of OpenFlow as it allows for forwarding decision-making to be performed by a centralized system that has global view and control over the network - the SDN Controller - thus configuring the reactive flow programming paradigm.
 This however comes with a considerable computational cost, since every first packet of each new flow being admitted into the network must be sent to and evaluated by the \gls{SDN} controller which in turn will instruct the switch(es) on how to behave for that flow.
