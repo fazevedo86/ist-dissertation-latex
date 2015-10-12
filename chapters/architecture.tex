@@ -62,13 +62,15 @@ The minimum set of cluster membership and \gls{MIB} update messages and associat
 			\hline
 			\textbf{Scope} & \textbf{Message} & \textbf{Event} & \textbf{Target}\\
 			\hline
-			Cluster membership & Join cluster & New \gls{SDN} instance created and requesting to join the existing cluster & cluster\\
+			Cluster membership & Join cluster & New \gls{SDN} controller instance created and requesting to join the existing cluster & cluster\\
 			\hline
-			Cluster membership & Leave cluster & \gls{SDN} instance shutting down and requesting to leave the cluster & cluster\\
+			Cluster membership & Leave cluster & \gls{SDN} controller instance shutting down and requesting to leave the cluster & cluster\\
 			\hline
-			Cluster membership & Full Synchronization Request & \gls{SDN} instance requesting a full \gls{MIB} update & specific instance\\
+			Cluster membership & Instance health & \gls{SDN} controller instance periodic health report & cluster\\
 			\hline
-			Cluster membership & Full Synchronization Reply & \gls{SDN} instance replying to a full \gls{MIB} update & specific instance\\
+			Cluster membership & Full Synchronization Request & \gls{SDN} controller instance requesting a full \gls{MIB} update & specific instance\\
+			\hline
+			Cluster membership & Full Synchronization Reply & \gls{SDN} controller instance replying to a full \gls{MIB} update & specific instance\\
 			\hline
 			\gls{MIB} update & Add Switch & New OpenFlow switch connected to an instance & cluster\\
 			\hline
@@ -162,7 +164,8 @@ Because large network topologies often span over several geographical locations 
 % How it works
 As mentioned in chapter \ref*{chapter:state-of-the-art} section \ref{section:openflow}, OpenFlow switches are required to maintain active \gls{TCP} or \gls{TLS} connections with the configured \gls{SDN} controller(s).
 Since we are now considering the topology represented in figure \ref{fig:Amorphous} and the description, we now consider that the all OpenFlow switches are configured to connect exclusively to the request router cluster, which in turn will forward the connection to an \gls{SDN} controller instance.
-The \gls{SDN} controller instance then replies directly to the OpenFlow switch, as portrayed in figure \ref{fig:rr_message_flow}.\\
-Because both \gls{TCP} and \gls{TLS} are connection oriented, request router instances must always forward packets coming from an OpenFlow switch to the same \gls{SDN} controller instance.
+The \gls{SDN} controller instance then replies directly to the OpenFlow switch, as portrayed in figure \ref{fig:rr_message_flow}.
+Having this behavior as opposed to having the \gls{SDN} controller instance reply back to the request router instance improves both performance and scalability as the latency for the response packets will be lower and it removes computational load from the request router instances, thus allowing them to handle more request packets.\\
+Because both \gls{TCP} and \gls{TLS} (which uses \gls{TCP} as its transport layer protocol\cite{rfc5246}) are connection oriented, request router instances must always forward packets coming from an OpenFlow switch to the same \gls{SDN} controller instance.
 Therefore, the request router must implement a deterministic destination selection for all packets coming from the same OpenFlow switch, such that any request router instance will forward the packets from switch $\alpha$ to the exact same \gls{SDN} controller instance $\beta$.
 Should $\beta$ become unavailable then request router instances are required to stop forwarding packets to $\beta$ and assign a new \gls{SDN} controller instance $\upsilon$ and forward all packets from $\alpha$ to $\upsilon$.
