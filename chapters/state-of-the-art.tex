@@ -20,13 +20,13 @@ Figure \ref{fig:Traditional_Network_Architecture} depicts a two node network acc
 %
 Having these three planes tightly-coupled and implemented in the network nodes is the reason behind both the box-centric configuration style and vendor-specific configuration workflow and interface.
 \gls{SDN} decouples these planes from one another, defining the abstraction of \emph{Specification}, corresponding to the management plane functionality, \emph{Distribution}, corresponding to the control plane functionality, and \emph{Forwarding}, corresponding to the data plane functionality.
-By doing so, this new architectural concept makes it possible to logically centralize the \emph{Specification} and \emph{Distribution} while keeping the \emph{Forwarding} implemented in the network nodes\cite{Kreutz2014,OFWP,OpenNetworkingFoundation} thus creating the premises for a network infrastructure that harnesses the benefits of both distributed data forwarding and centralized management, dismissing today's decentralized network management style.\\
+By doing so, this new architectural concept makes it possible to logically centralize the \emph{Specification} and \emph{Distribution} while keeping the \emph{Forwarding} implemented in the network nodes\cite{Kreutz2014}\cite{OFWP},\cite{OpenNetworkingFoundation} thus creating the premises for a network infrastructure that harnesses the benefits of both distributed data forwarding and centralized management, dismissing today's decentralized network management style.\\
 %
 The second core feature of \gls{SDN} is the ability to programmatically configure the network, which is accomplished by having the Specification expose a set of \glspl{API} to be consumed by network applications.
 These \glspl{API} are generally capable of exposing the network topology through global and abstracted views, as well as providing methods of global policy definition and common network functionality such as routing, access control and bandwidth management\cite{OFWP}.
 The policies are then applied to the appropriate network nodes by the \emph{Distribution} through the use of a communication protocol implemented both on this abstraction and on the network elements.\\
 %
-These two core concepts lead to the definition of the architecture of \gls{SDN} in three layers, the \emph{Application} layer, the \emph{Control} layer and the \emph{Infrastructure} layer \cite{OpenNetworkingFoundation,Kreutz2014} as depicted in Figure \ref{fig:SDN_Architecture}.
+These two core concepts lead to the definition of the architecture of \gls{SDN} in three layers, the \emph{Application} layer, the \emph{Control} layer and the \emph{Infrastructure} layer \cite{OpenNetworkingFoundation}\cite{Kreutz2014} as depicted in Figure \ref{fig:SDN_Architecture}.
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.70]{SDN_Architecture}
@@ -48,7 +48,7 @@ Furthermore, applications can be written to dynamically adjust network policies 
 Another inherent advantage of this solution is the consistency of the policy throughout the network, seeing that the policy is now defined by the network operator through a network application in a global scope and in a single point, therefore eliminating inconsistencies in configurations between different network nodes.\\
 %
 
-There are currently several implementations for SD\gls{SDN}N controllers such as OpenDaylight, Floodlight and ONOS\cite{ControllerComparison} \cite{Kreutz2014}, as well as southbound interfaces such as OpenFlow, POF, ForCES and OpFlex \cite{Kreutz2014}.
+There are currently several implementations for SD\gls{SDN}N controllers such as OpenDaylight\cite{OpenDaylight}, Floodlight\cite{Floodlight} and ONOS\cite{ControllerComparison} \cite{Kreutz2014}, as well as southbound interfaces such as OpenFlow, POF, ForCES and OpFlex \cite{Kreutz2014}.
 Although at first it might not be obvious at first, the fact that multiple southbound interfaces exist presents itself as an issue, given that either network elements or \gls{SDN} controllers must implement more than one of them in order to achieve compatibility between \gls{SDN} controllers and network elements.
 Because there is now a dominant southbound interface - OpenFlow - the vast majority of network elements implementing the \gls{SDN} architecture are implementing only OpenFlow.\\
 %
