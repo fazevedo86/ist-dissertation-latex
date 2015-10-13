@@ -62,12 +62,18 @@ In order to overcome this limitation without going into complex message delivery
 All of the messages specified in table \ref{table:cluster-message-spec} within the scope of cluster membership and targeted at the whole cluster are guaranteed to fit in a message which size is lesser than the \gls{MTU} and are therefore not affected by this workaround, thus keeping the group communication properties required for cluster formation and maintenance intact.\\
 In order to reduce the amount of data transmitted and at the same time provide a fail recovery mechanism, the Join cluster and Instance health messages defined in table \ref{table:cluster-message-spec} were merged into the a single message (Join cluster), having each instance the responsibility differentiating the message purpose according to whether the instance sending the message was already registered (in which case a timestamp indicating the last time the instance reported activity is updated) or not (in which case the registration process is executed).\\
 %
-\subsection{Distributed data forwarding}
+\subsection{Distributed network policy module}
 \label{subsection:poc-application}
-
+%
+Floodlight comes bundled with a set of network applications that provide network policy functionality out the box.
+One of these applications is the Forwarding module, which is a module providing a default policy of permit any to any communications, installing flow entries to allow flows in a reactive fashion\cite{FLFwd}.\\
+The nature of this modules makes it a perfect test subject for the proposed architecture, however, in order to better demonstrate the full potential of the proposed architecture this module was extended to take advantage of the inter-instance communication mechanism provided by the Global State Service so that the forwarding policy is only computed on the \gls{SDN} controller instance managing the OpenFlow switch to which the device that initiates the flow is connected to. Controller instances managing other OpenFlow switches in the path the flow takes to traverse the network are simply instructed which flow entries to add to which switches instead of having to compute the policy by themselves.
+This approach increases scalability as the computational cost of determining the actions to be performed for any given flow is only inflicted in one controller instance, leaving other controller instances free to compute the flows being admitted into the network through OpenFlow switches that they control directly.\\
+Upon receiving a Packet-In for a packet hit the table miss flow, the extended version of the Forwarding module consumes the \gls{API} of the Global Topology Service in order to determine if both source and destination devices are already known in the topology (at global scope) and if so which is the shortest path between the two.
 %
 \section{Request Router}
 \label{section:request-router}
+
 %TODO: Linux LVS
 %TODO: DSR
 %TODO: Anycast mechanism: BGP ECMP (Quagga) + Loopback on Controllers + disable RPF on core routers
