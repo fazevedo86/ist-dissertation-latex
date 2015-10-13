@@ -9,15 +9,9 @@
 The architectural principles of \gls{SDN} and its most prominent supporting protocol - \emph{OpenFlow} - keep gaining momentum.
 \gls{SDN} relies essentially on the decoupling of the \emph{control plane} from the \emph{data plane}, placing the former in a logically centralized component to be executed on commodity hardware - the \emph{\gls{SDN} controller}.
 % How OF works & associated limitations
-OpenFlow features proactive and reactive programming.
-The proactive mode is based on static programming of the data plane.
-Reactive programming enables the programming of the network based on real-time decisions taken as new traffic hits the data plane, but it requires the first packet of every new flow traversing any \gls{SDN} controlled device to be sent to the controller and evaluated.
-The proper action is then programmed in the device, and the packet is sent back to the data plane.
-While reactive mode offers a much more convenient and flexible method to program the network when compared with proactive mode, the inherent computational cost of performing the associated tasks in large networks becomes too large to be handled by a single \gls{SDN} controller instance.
-One way to overcome this limitation is to have several \gls{SDN} Controller instances running separately, each one handling a subset of network devices.
-However, this solution requires  a complex and cumbersome configuration of both \gls{SDN} controllers and OpenFlow devices in order to keep consistent network rules and efficient load sharing across controllers.
-% My solution
-In order to make the most out of OpenFlow's potential, a new architecture for OpenFlow \gls{SDN} controllers has been developed, centered on the concept of elastic \gls{SDN} controller clustering and anycast communication paradigm.
+OpenFlow's reactive programming enables the programming of the network based on real-time decisions taken as new traffic hits the data plane, but it requires the first packet of every new flow traversing any \gls{SDN} controlled device to be sent to the controller and evaluated, which when considered in large network environments becomes too large to be handled by a single \gls{SDN} controller instance.\\
+% My work
+This document describes a new architectural proposal for an elastic \gls{SDN} controller cluster as a solution to overcome the aforementioned limitations, along with proof of concept implementation of said architecture by extending the Floodlight controller and integrating it with the Linux Virtual Server project.
 % Keywords
 \begin{flushleft}
 
