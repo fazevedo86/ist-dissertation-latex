@@ -2,9 +2,9 @@
 
 \chapter{Implementation}
 \label{chapter:implementation}
-To demonstrate the architecture feasibility and validity, a proof of concept implementation has been developed by means of extending an existing \gls{SDN} controller.
-The requirements set for the choice of the controller were controller completeness, popularity and availability of source code, which lead to a final decision between OpenDaylight\cite{OpenDaylight} and Floodlight\cite{Floodlight}\cite{Kreutz2014}\cite{ControllerComparison}.\\
+To demonstrate the architecture feasibility and validity, a proof of concept implementation has been developed by means of extending an existing \gls{SDN} controller and integrating a Linux kernel module for clustering.\\
 %
+The requirements set for the choice of the controller were controller completeness, popularity and availability of source code, which lead to a final decision between OpenDaylight\cite{OpenDaylight} and Floodlight\cite{Floodlight}\cite{Kreutz2014}\cite{ControllerComparison}.
 %Justify choice of Floodlight
 While both OpenDaylight and Floodlight are modular open-source \gls{SDN} controllers implemented in Java, highly popular and supported by major players in the networking industry\cite{OpenDaylight}\cite{Floodlight}, however, at the time of the decision, Floodlight, which was at version 1.1, had a more stable implementation when compared with the OpenDaylight, which was at release Helium.
 OpenDaylight also offers support for multiple Southbound Interface protocols, which while falling outside the scope of this work renders the platforms architecture more complex than that of Floodlight, and would therefore add more complexity to the implementation.
@@ -62,6 +62,9 @@ In order to overcome this limitation without going into complex message delivery
 All of the messages specified in table \ref{table:cluster-message-spec} within the scope of cluster membership and targeted at the whole cluster are guaranteed to fit in a message which size is lesser than the \gls{MTU} and are therefore not affected by this workaround, thus keeping the group communication properties required for cluster formation and maintenance intact.\\
 In order to reduce the amount of data transmitted and at the same time provide a fail recovery mechanism, the Join cluster and Instance health messages defined in table \ref{table:cluster-message-spec} were merged into the a single message (Join cluster), having each instance the responsibility differentiating the message purpose according to whether the instance sending the message was already registered (in which case a timestamp indicating the last time the instance reported activity is updated) or not (in which case the registration process is executed).\\
 %
+In order for inter-switch links connecting OpenFlow switches controller by different instances to be properly detected and registered into the global topology, the LinkDiscoveryManager module had to altered in such a way that the incoming \gls{LLDP} packets sent by other controller instances are processes according to the topology made available by the Global topology Service instead.
+This represents the only change required to the Floodlight core modules in order for the proof of concept implementation to work.
+%
 \subsection{Distributed network policy module}
 \label{subsection:poc-application}
 %
@@ -76,10 +79,69 @@ If however the destination is known in the global topology, it takes the path co
 Flow Programming Requests are then processed by the receiving instances which notify the instance that sent it with a Flow Programming Confirmation message upon completion.
 The instance that computed the policy is only allowed to program the flow entry in the OpenFlow switch that triggered the Packet-In after receiving Flow Programming Confirmation messages from all remote instances involved, thus making sure that there will be no other Packet-In triggered in the path.
 %
+%TODO: Lamport clocks to guarantee causal consistency and avoid loss of information during the sync process (message buffer)
+%
 \section{Request Router}
 \label{section:request-router}
-
+The request router component was implemented by integrating Linux virtual machines running Linux kernel 3.16 compiled with the \gls{IPVS} module, with the Elastic \gls{SDN} controller cluster.
+The \gls{IPVS} module, pertaining to the Linux Virtual Server Project, provides an efficient kernel-mode \gls{OSI} layer 4 switching facility, suited to load balance client connections between several clustered servers \cite{LVS}.
+In order to implement the \gls{anycast} communication paradigm, it is assumed that the core network infrastructure to which the OpenFlow management interfaces and \gls{SDN} controller instances are connected to support the \gls{BGP} routing protocol and are able to peer with request router instances.
+The configuration of the network is not within the scope of this work.
+%
+\subsection{Linux Virtual Server}
 %TODO: Linux LVS
-%TODO: DSR
-%TODO: Anycast mechanism: BGP ECMP (Quagga) + Loopback on Controllers + disable RPF on core routers
+The Linux Virtual Server project, in particular the \gls{IPVS} module, provides an out of the box load balance facility for client-server applications connecting through the network and using the \gls{IPv4} stack.
+This module, implemented as a kernel module, introduces minimal overhead in the client-server communication and can be deployed as a cluster, in which mode forwarding states will be synchronized between cluster members, thus allowing for the required infrastructure resiliency seeing that a request router instance failure will not impact normal operation as its peer instance is able to take over the forwarding function seamlessly \cite{LVSSync}.\\
+%
+%TODO: IPVS modes http://www.linuxvirtualserver.org/how.html : Because of DST -> VS/DR
+The load balancing is performed at the Transport Layer of the \gls{OSI} model, supporting both \gls{UDP} and \gls{TCP} protocols.
+IPVS receives the connection data from the client for a configured service cluster and forwards it to the one of the servers available for that cluster in one of three possible ways\cite{IPVSHow}:
+\begin{itemize}
+	\item In \textbf{\gls{NAT} mode}, \gls{IPVS} terminates the client connection and initiates a new connection with the service cluster instance determined by the load balance algorithm, forwarding all the packets received from the client to the server, masquerading however the source \gls{IPAddress}, effectively forcing data communications to go through the load balancer in both ways. While this mode offers the advantage of allowing the service cluster servers to be located anywhere on the network and requiring no configuration on the clients nor the servers, it has limited scaling capabilities as \gls{NAT} itself is limited when it comes to scaling
+	%
+	\item In \textbf{IP Tunneling mode}, \gls{IPVS} does not terminate the client-server communication and instead encapsulates the data being received from the client inside an IP-IP packet and forwards it to the service cluster instance determined by the load balance algorithm. This mode also offers the advantage of allowing the service cluster servers to be located anywhere on the network, requiring however that the servers support the IP-IP tunneling (which introduces minimal overhead) and the configuration of loopback interfaces with the service cluster \gls{IPAddress} in all of the service cluster servers. It is however much more scalable than \gls{NAT} mode, since this mode does not perform \gls{NAT} nor does it process packets coming from the server to the client.
+	%
+	\item In \textbf{Direct Routing mode}, \gls{IPVS} behaves essentially in the same way as in the IP Tunneling mode, however instead of performing encapsulation the load balancer is instead required to be on the same \gls{OSI} layer 2 as the service cluster servers, forwarding the packets received by the client directly to the service cluster instance determined by the load balance algorithm. While this mode offers the same advantages as the IP Tunneling mode and without the IP Tunneling drawback, the requirement of being in the same \gls{OSI} layer 2 as the service cluster server represents a limitation in terms of solution design.
+	%
+\end{itemize}	
+%
+Both the IP Tunneling and Direct Routing modes met the requirements set for the request router component, however, the IP Tunneling mode chosen for this implementation since it does not limit the deployment topology and IP-IP tunneling is natively supported in modern Linux kernels.
+It is worth to note however that the forwarding mode is determined by server and not by service cluster, which means that it is possible to use more than one of these modes simultaneously for different servers in the same service cluster.\\
+%
+IPVS also offers a number of load balance algorithms that can be used to determine to which service cluster instance the client connection should be forwarded to:
+%
+\begin{itemize}
+	\item The \textbf{Round Robin} algorithm iterates through the configured servers, assigning client connections equally to each.
+	%
+	\item The \textbf{Weighted Round Robin} algorithm allows the definition of weights per server, which are then taken into account when assigning client connections such that servers with higher weight are assigned more connections.
+	%
+	\item The \textbf{Least-Connections} algorithm assigns new client connections to the server with least active connections.
+	%
+	\item The \textbf{Weighted Least-Connections} algorithm is the default algorithm and like the Weighted Round Robin it allows for the definition of weights per server. It then assigns new client connections to the server with the lowest Connections to Weight ratio.
+	%
+	\item The \textbf{Locality-Based Least-Connections} algorithm assigns incoming connections to the same server if it is not overloaded or unavailable, in which case it assigns the connection to another server with fewer connections.
+	%
+	\item The \textbf{Locality-Based Least-Connection with Replication} algorithm defines a server set that can serve the client's request and forwards the packets to the server in that set with least active connections. If all servers in the set are overloaded, a new server belonging to the service cluster is added to the set of servers that can serve the client and the packets are forwarded to that server.
+	%
+	\item The \textbf{Destination Hashing} algorithm consistently assigns server by looking up a hash table using the service cluster \gls{IPAddress} as key.
+	%
+	\item The \textbf{Source Hashing} algorithm consistently assigns server by looking up a hash table using the client's \gls{IPAddress} as key.
+	%
+	\item The \textbf{Shortest Expected Delay} algorithm assigns client connections to the server that is expected to have the shortest delay, which is estimated by $\frac{(C + 1)}{U}$ where C is the number of connections for the server and U the Weight assigned to the server.
+	%
+	\item The \textbf{Never Queue} algorithm assigns client connections to on of the idling servers. Should there be no idling server the Shortest Expected Delay is used to assign a server.
+	%
+\end{itemize}
+%
+The optimal algorithm according to the requirements set for the request router would be the Source Hashing since it guarantees a deterministic load balancing decision, however, for the purposes of testing this implementation using a network emulator Least Connections was chosen instead seeing that the Source Hashing would always assign the same server since the source \gls{IPAddress} would always be the same for all OpenFlow switches (that of the emulator).
+%
+\subsection{Elastic Cluster Integration}
 %TODO: Request Router component (Multicast integration)
+The configuration of IPVS is performed automatically by a developed component that also joins the controller cluster multicast group in order to monitor cluster membership events and update IPVS accordingly.
+
+\subsection{Anycast routing}
+%TODO: Anycast mechanism: BGP ECMP (Quagga) + Loopback on Controllers + disable RPF on core routers
+%The IP anycast functionality is obtained by adding a loopback interface in each request router instance, configured with the request router's cluster virtual IP, and by running Border Gateway Protocol (BGP) that peers with the core network and advertises a path to the request router's cluster virtual IP through the request router instance.
+%The BGP protocol is executed on top of Quagga routing software suite.
+%
+
