@@ -137,6 +137,22 @@ The optimal algorithm according to the requirements set for the request router w
 %
 \subsection{Elastic Cluster Integration}
 %TODO: Request Router component (Multicast integration)
+The request router must integrate with the \gls{SDN} controller elastic cluster in order to determine the set of active controller instances to which it can forward OpenFlow switch connections.
+To do that, a new component was developed, much like the developed Floodlight module, joining also the same multicast group in order to receive Join messages through which it infers the active set of controller instances.
+Because the message encondig/decoding is performed using Java's object serialization, this components implementation necessarily had to be made using the Java language as well.
+Figure \ref{fig:rr_block_diagram} depicts a high level block diagram of the developed component.\\
+%
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.65]{rr_block_diagram}
+	\caption{Request Router integration component high level block diagram}
+	\label{fig:rr_block_diagram}
+\end{figure}
+%
+This component interfaces with the \gls{IPVS} module through the ipvsadm, a command line tool design to control \gls{IPVS}, enabling the creation of service clusters and the addition and removal of servers from service clusters.
+To do so, the developed component launches new processes for each execution of the ipvsadm tool necessary and parses its output in order to extract status information and command execution success.
+
+
 The configuration of IPVS is performed automatically by a developed component that also joins the controller cluster multicast group in order to monitor cluster membership events and update IPVS accordingly.
 
 \subsection{Anycast routing}
