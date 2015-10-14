@@ -11,11 +11,12 @@ A arquitetura \gls{SDN} tem por base o desacoplamento do \emph{control plane} do
 O modo de programação reativa do OpenFlow permite a programação da rede em tempo real, tomando decisões de encaminhamento conforme o tráfego dá entrada no \emph{data plane}, sendo necessário para tal que a primeira trama de cada fluxo que atravesse um qualquer dispositivo de rede gerido por um controlador \gls{SDN} seja reencaminhado para o controlador para que seja inspecionado.
 Embora o modo reativo proporcione um método mais conveniente e flexível para programar a rede quando comparado com o modo proactivo, o custo computacional associado à execução das tarefas necessárias torna-se incomportável para ser executado por uma única instância do controlador \gls{SDN} quando aplicado a redes de grande dimensão.\\
 % My work
-Propõe-se neste documento uma nova arquitetura que visa tornar o controlador \gls{SDN} num cluster elástico como solução para o problema de escalabilidade apresentado, tendo sido esta mesma arquitetura implementada através da exntensão do controlador Floodlight e da integração com o projecto Linux Virtual Server.
+Propõe-se neste documento uma nova arquitetura que torna o controlador \gls{SDN} num cluster elástico visando a solução para o problema de escalabilidade apresentado através da existência de várias instâncias de controlador \gls{SDN} que atuam como um único controlador, ficando no entanto cada instância responsável pela gestão de um subconjunto dos switches OpenFlow que compõem a rede.
+Houve ainda lugar a uma implementação de prova de conceito através da extensão do controlador Floodlight e da integração com o projeto Linux Virtual Server.
 % Keywords
 \begin{flushleft}
 
-\keywords{Software-Defined Networking, OpenFlow, Network Function Virtualization, Gestão de redes, \gls{SDN} Controller Distribuído}
+\keywords{Software-Defined Networking, OpenFlow, Gestão de redes, Controlador \gls{SDN} Distribuído}
 
 \end{flushleft}
 

@@ -11,11 +11,12 @@ The architectural principles of \gls{SDN} and its most prominent supporting prot
 % How OF works & associated limitations
 OpenFlow's reactive programming enables the programming of the network based on real-time decisions taken as new traffic hits the data plane, but it requires the first packet of every new flow traversing any \gls{SDN} controlled device to be sent to the controller and evaluated, which when considered in large network environments becomes too large to be handled by a single \gls{SDN} controller instance.\\
 % My work
-This document describes a new architectural proposal for an elastic \gls{SDN} controller cluster as a solution to overcome the aforementioned limitations, along with proof of concept implementation of said architecture by extending the Floodlight controller and integrating it with the Linux Virtual Server project.
+This document describes a new architectural proposal for an elastic \gls{SDN} controller cluster as a solution to overcome the aforementioned limitations by allowing for the existence of multiple \gls{SDN} controller instances acting as a single controller but handling each a subset of the OpenFlow switches that comprise the network.
+A proof of concept of said architecture has been implemented by extending the Floodlight controller and integrating it with the Linux Virtual Server project.
 % Keywords
 \begin{flushleft}
 
-\keywords{Software-Defined Networking, OpenFlow, Network Function Virtualization, Network Management, Distributed \gls{SDN} Controller}
+\keywords{Software-Defined Networking, OpenFlow, Network Management, Distributed \gls{SDN} Controller}
 
 \end{flushleft}
 
