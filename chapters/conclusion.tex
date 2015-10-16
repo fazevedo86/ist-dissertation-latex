@@ -4,17 +4,15 @@
 \label{chapter:conclusion}
 \gls{SDN} presents itself as the solution for traditional network management problems, and OpenFlow while being the most promising protocol implementing the \gls{SDN} architecture offers two different approaches to program the network, namely reactive and proactive programming.\\
 While reactive programming offers a much more flexible and convenient method to program the network, it comes with a computational cost that becomes a limitation when applied to large scale networks.\\
-With this work we proposed a novel architecture for OpenFlow controllers based on the concept of SDN controller elastic clustering and coupled with a load balance infrastructure.
-The proposed architecture provides a scalable solution for reactive programming in large networks and, at the same time, increased redundancy and resilience in case of failure of a single controller, while keeping the centralized management paradigm typical to \gls{SDN} and without introducing complex distributed coordination algorithms to the controller implementation.\\
-To validate the architecture, we implemented a prototype of the \gls{SDN} controller cluster by extending version 1.1 of the Floodlight controller.
+In this work we proposed a novel architecture for OpenFlow controllers based on the concept of SDN controller elastic clustering and coupled with a load balance infrastructure.
+The proposed architecture provides a scalable solution for reactive programming in large networks and, at the same time, increased redundancy and resilience in case of failure of a single controller, while keeping the centralized management paradigm typical to \gls{SDN} and without introducing complex distributed coordination algorithms in the controller implementation.\\
+To validate the proposed architecture, we implemented a prototype of the \gls{SDN} controller cluster by extending version 1.1 of the Floodlight controller.
 A prototype of the load balance infrastructure was also implemented, using free open-source components such as Quagga and \gls{IPVS} and relaying in proven standards such as \gls{BGP} and \gls{BFD}.\\
 %
-The global prototype implementation of the proposed architecture showed that it is able to provide a full functional elastic controller cluster for \gls{SDN} applications, thus removing the limitations of OpenFlow's reactive programming when deployed in large networking environments.\\
+The global prototype implementation of the proposed architecture showed that it is able to provide a fully functional elastic controller cluster for \gls{SDN} applications, thus removing the limitations of OpenFlow's reactive programming when deployed in large networking environments.\\
 %
 Along with the implementation of the prototype a sample \gls{SDN} application was also developed in order to demonstrate the use of the architecture.
-Testing to this application showed that increasing the number of clustered controller instances and consequently partitioning the OpenFlow switches among them does not affect overall performance, further proving the desired scalability properties of the architecture.
+Testing to this application showed that increasing the number of clustered controller instances and consequently partitioning the OpenFlow switches among them does not affect overall performance, further proving the desired scalability properties of the proposed architecture.\\
 %
-\section{Future work}
-\label{section:future-work}
-Although the implementation described in this work served its purpose as a prototype, a more carefully developed solution that goes deeper into the controller core implementation will provide a considerable increase in performance.\\
+Although the implementation described in this work served its purpose as a prototype, a more carefully developed solution that goes deeper into the controller core implementation will provide a considerable increase in performance.
 The standardization of the message set exchanged between controller instances pertaining to the same cluster and implementation as an Apllication layer protocol will make way for the existence of controller clusters composed of controller instances implemented in different languages and more fit to handle specific needs. 

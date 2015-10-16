@@ -23,17 +23,17 @@ Having the instances coordinated with each other and keep consistent states in a
 	\label{fig:sdn_simple_clustering}
 \end{figure}
 %
-\gls{SDN} cluster instances must then provide eastbound/westbound \glspl{API}s that allow for cluster membership operations.
+\gls{SDN} cluster instances must then provide eastbound/westbound \glspl{API} that allow for cluster membership operations.
 The resulting cluster should support key aspects of the \gls{SDN} controller component, such as keep a global view and management scope.
 Because the goal is to perform load balancing between all instances, each instance will be actively managing any given number of OpenFlow switches in the same management domain, and therefore the network state is distributed in nature.
-In order to improve scalability and resiliency, new \gls{SDN} controller instances can be added, and removed on demand from the cluster without requiring any reconfiguration or service interruption.\\
+In order to improve scalability and resiliency, new \gls{SDN} controller instances can be added and removed on demand from the cluster, without requiring any reconfiguration or service interruption.\\
 %
-To that extent, when a new \gls{SDN} controller instance is initialized it must advertise itself to all existing \gls{SDN} controller instances, forming a cluster if only one other instance existed prior to the advertisement or otherwise joining the existing cluster.
-In order for this to be accomplished either the newly instantiated \gls{SDN} controller would require to have prior knowledge of all existing instances or instead some mechanism of peer instance discovery.
-Peer instance discovery offers a mechanism much closer to the zero-configuration goal that this architecture aims at.
-The discovery mechanism considered is that of \emph{group communication}, which is itself a form of \emph{indirect communication}, in which the sender is not aware of the receivers and thus instead of sending the message to a specific receiver it sends the message to a group, which will then have the message delivered to all members of said group\cite{PADI}.\\
+To that extent, when a new \gls{SDN} controller instance is initialized it must advertise itself to all existing \gls{SDN} controller instances, forming a cluster if only one other instance exists prior to the advertisement or otherwise joining the existing cluster.
+In order for this to be accomplished either the newly instantiated \gls{SDN} controller would need to have prior knowledge of all existing instances or, instead, some mechanism of peer instance discovery must be available.
+Peer instance discovery offers a mechanism much closer to the zero-configuration goal that this architecture targets.
+The discovery mechanism considered is that of \emph{group communication}, which is itself a form of \emph{indirect communication}, in which the sender is not aware of the receivers and thus instead of sending the message to a specific receiver it sends the message to a group, which will then have the message delivered to all members of such group \cite{PADI}.\\
 Upon joining a cluster, regardless if new or existing, the joining instance(s) must then synchronize its \gls{MIB} with any other peer instance, from which point on it will proceed to process updates from other peers.
-The \gls{SDN} controller instance cluster registration process is defined in figure \ref{fig:cluster_registration_process}, and the set of messages for cluster membership in table \ref{table:cluster-message-spec}\\
+The \gls{SDN} controller instance cluster registration process is defined in Figure \ref{fig:cluster_registration_process}, and the set of messages for cluster membership in table \ref{table:cluster-message-spec}\\
 %
 \begin{figure}
 	\centering
@@ -42,17 +42,17 @@ The \gls{SDN} controller instance cluster registration process is defined in fig
 	\label{fig:cluster_registration_process}
 \end{figure}
 %
-Because \gls{SDN} controller instances are prone to failure due to software, hardware or network failures at any given point in time and without being able to notify its peers, it is important to provide a mechanism that makes every cluster member aware of peers state.
+Because \gls{SDN} controller instances are prone to failure due to software, hardware or network failures, at any given point in time, which prevents them from being able to notify peers, it is important to provide a mechanism that makes every cluster member aware of their peers state.
 As such, two mechanism have been defined for instance failure detection: session identifiers and periodic health checks.\\
-\gls{SDN} controller instances must generate a unique session identifier when initializing itself, which will then serve as an identifying key for cluster members, and therefore must be included in every message exchanged with peering instances.
+\gls{SDN} controller instances must generate a unique session identifier when initializing themselves, which will then serve as an identifying key for cluster members, and therefore must be included in every message exchanged with peering instances.
 When a \gls{SDN} controller instance $\alpha$ receives a message from a peer instance $\beta$ which is identified by session identifier $\upsilon$, $\alpha$ must validate that the membership key $\kappa$ it holds for peer $\beta$ has not changed ($\kappa$=$\upsilon$) before processing the message.
-Should the session identifier have changed ($\kappa$$\neq$$\upsilon$), $\alpha$ must invalidate all \gls{MIB} registries it held associated with peer $\beta$.\\
-In order to ensure fast failure detection and quickly invalidate any \gls{MIB} registry that might lead to erroneous forwarding decisions, all \gls{SDN} controller instances participating in a cluster must send periodic (every $\Delta$ seconds) \gls{Keepalive} notifications to its peers.
+Should the session identifier have changed ($\kappa$$\neq$$\upsilon$), $\alpha$ must invalidate all \gls{MIB} entries associated with peer $\beta$.\\
+In order to ensure fast failure detection and quickly invalidate any \gls{MIB} entry that might lead to erroneous forwarding decisions, every \gls{SDN} controller instance participating in a cluster must send periodic (every $\Delta$ seconds) \gls{Keepalive} notifications to its peers.
 Should an instance $\alpha$ fail to receive three consecutive \gls{Keepalive} notifications (3$\Delta$ seconds) from a peer instance $\beta$, then $\alpha$ must assume that $\beta$ is no longer available and therefore render all \gls{MIB} entries associated with $\beta$ invalid.\\
 %
-In order to maintain the aforementioned behavior, active instances must issue cluster membership and \gls{MIB} updates to their cluster peers and be prepared to receive membership and update their own \gls{MIB} with updates issued by their peers.
+In order to maintain the aforementioned behavior, active instances must issue cluster membership and \gls{MIB} updates to their cluster peers and be prepared to update themselves with the information issued by their peers.
 The propagation of \gls{MIB} updates must be triggered for every network event detected by a given instance.
-The minimum set of cluster membership and \gls{MIB} update messages and associated events, along with which instances must be notified, are specified in table \ref{table:cluster-message-spec}.
+The minimum set of cluster membership and \gls{MIB} update messages and associated events, along with which instances must be notified, are specified in Table \ref{table:cluster-message-spec}.
 %
 \begin{table}[h!]
 	\begin{center}
@@ -90,20 +90,20 @@ The minimum set of cluster membership and \gls{MIB} update messages and associat
 	\end{center}
 \end{table}
 %
-When a \gls{SDN} cluster instance propagates updates to other peer instances, it must guarantee \emph{causal consistency}, thus ensuring that any dependencies between updates is met.
-Causal consistency ensures that messages send by an instance $\alpha$ are seen by every other instance receiving them in the exact same order that they where sent by $\alpha$, thus guaranteeing \emph{potencial causal ordering} of events throughout the cluster \cite{PADI}.
+When a \gls{SDN} cluster instance propagates updates to other peer instances, it must implement \emph{causal consistency}, thus ensuring that any dependencies between updates are met.
+Causal consistency ensures that messages sent by an instance $\alpha$ are seen by every other instance receiving them in the exact same order that they where sent by $\alpha$, thus guaranteeing \emph{potential causal ordering} of events throughout the cluster \cite{PADI}.
 This property is crucial to maintain the integrity of the distributed data model, as it guarantees that scenarios such as adding an inter-switch link before adding the switches themselves do not happen.\\
 %
-This architecture allows for coordination between \gls{SDN} controller instances, providing each instance with a global view of the network regardlessly of which network node(s) it manages.
-This approach, however, still requires that every OpenFlow switch within the management domain be reconfigured every time an \gls{SDN} controller instance is added to or removed from the \gls{SDN} controller cluster, which takes us back to a manual, decentralized and vendor-specific network management model.\\
+This architecture enables the necessary for coordination between \gls{SDN} controller instances, providing each instance with a global view of the network regardlessly of the network node(s) it manages.
+This approach, however, still requires that every OpenFlow switch within the management domain be reconfigured every time an \gls{SDN} controller instance is added, to or removed from, the \gls{SDN} controller cluster, which takes us back to a manual, decentralized and vendor-specific network management model.\\
 %
 \section{Request Router}
 \label{section:request-router}
 % existing solutions
 The mechanism provided by OpenFlow to load balance between clustered \gls{SDN} controller instances and inherently provide resilience requires one of the following:
 \begin{enumerate}
-	\item OpenFlow switches are configured with all the ip addresses of all the controller instances (and then either let Master/Slave role election occur or have the controller implementation extended such that multiple instances in Equal role can coordinate between themselves which instance will process which event)
-	\item The network is partitioned such that different subsets of network are controlled by different controllers as depicted in figure \ref{fig:static_controller_distribution}
+	\item OpenFlow switches are configured with all the \gls{IPAddress}es of all the controller instances, and then either let Master/Slave role election occur or have the controller implementation extended such that multiple instances in Equal role can coordinate between themselves which instance will process which event;
+	\item The network is partitioned such that different subsets of network are controlled by different controllers as depicted in Figure \ref{fig:static_controller_distribution}.
 \end{enumerate}
 %
 \begin{figure}
@@ -115,20 +115,20 @@ The mechanism provided by OpenFlow to load balance between clustered \gls{SDN} c
 %
 % Problems with existing solutions
 The first approach adds a considerable amount of complexity both to the OpenFlow switch configuration and to the controller implementation, providing however the basis for equitable load balancing and controller resiliency.
-The second has the advantage of removing complexity both from the OpenFlow switches and the controller implementation, but it is still suboptimal as it does not guarantee equal load balancing across controller instances. In fact, a subset $\alpha$ of OpenFlow switches may process more traffic flows than a subset $\beta$, resulting in a higher computational load on the instance controlling subset $\alpha$ when compared to the instance controlling subset $\beta$.\\
+The second has the advantage of removing complexity both from the OpenFlow switches and the controller implementation, but it is still suboptimal as it does not guarantee equal load balancing across controller instances. In fact, a subset $\Psi$ of OpenFlow switches may process more traffic flows than a subset $\Gamma$, resulting in a higher computational load on the instance controlling subset $\Psi$ when compared to the instance controlling subset $\Gamma$.\\
 %
 % Requirements
-In order to provide a solution that keeps the advantages and discards the disadvantages of both approaches, it is then necessary for the existence of a mechanism that transparently assigns the less-loaded instance to an OpenFlow switch - a load balancing component.
+In order to provide a solution that keeps the advantages and eliminates the disadvantages of both approaches, it is then necessary to implement of a mechanism that transparently assigns the least-loaded instance to an OpenFlow switch - a load balancing component.
 This new component, the \emph{request router}, must be completely transparent to all three components of the \gls{SDN} architecture, while providing load balance between \gls{SDN} controller instances without compromising infrastructure resiliency.\\
 %
 % Request Router Overview
-The request router encapsulates all the controller instances as a single virtual instance from the OpenFlow switches and network applications point of view, by logically sitting between the \gls{SDN} controller instances and the OpenFlow switches and having the OpenFlow switches connect to a request router instance instead.
+The request router encapsulates all the controller instances as a single virtual instance from the OpenFlow switches and network applications point of view, by logically sitting between the \gls{SDN} controller instances and the OpenFlow switches and having the OpenFlow switches connect to a request router instance instead of directly connecting to controller instances.
 The request router is then responsible to determine which is the best \gls{SDN} controller instance to handle the OpenFlow switch and forward the request to that instance.\\
 %
 % Controller instance discovery
-To be able to forward connections to \gls{SDN} controller instances, it is necessary for the request router to be aware of existing \gls{SDN} controller instances so that the logical topology described in figure \ref{fig:distributed_controller_rr} can be achieved.
-This can be attained simply by having the request router instances joining the communication group described in section \ref{section:SDN-controller-cluster} and listening for the cluster membership messages described in table \ref{table:cluster-message-spec}.
-The same \gls{Keepalive} mechanism described in section \ref{section:SDN-controller-cluster} must also be implemented on the request router in order for request routers to also detect failing \gls{SDN} controller instances.\\
+To be able to forward connections to \gls{SDN} controller instances, it is necessary for the request router to be aware of all existing \gls{SDN} controller instances such that the logical topology described in Figure \ref{fig:distributed_controller_rr} can be achieved.
+This can be attained simply by having the request router instances joining the communication group described in Section \ref{section:SDN-controller-cluster} and listening for the cluster membership messages described in Table \ref{table:cluster-message-spec}.
+The same \gls{Keepalive} mechanism described in Section \ref{section:SDN-controller-cluster} must also be implemented on the request router in order for the request routers to be also able to detect failing \gls{SDN} controller instances.\\
 %
 \begin{figure}
 	\centering
@@ -138,13 +138,13 @@ The same \gls{Keepalive} mechanism described in section \ref{section:SDN-control
 \end{figure}
 %
 % Redundancy (failure+LB)
-In order to maintain infrastructure resiliency, it is imperative that the execution of the load balance function does not affect the connections between OpenFlow switches and \gls{SDN} controller instances and that a failure of any given request router instance does not have impact on the load balancing service.
-The request router then must implement a clustering mechanism that allows the existence of several request router instances, in which active OpenFlow switch management connections are processed by any available request router instance, thus load balancing the connections between themselves so that request router instances do not become overloaded, and where any request router instance $\alpha$ can take over the tasks performed by instance $\beta$ should $\beta$ fail.\\
+In order to maintain infrastructure resiliency, it is imperative that the execution of the load balancing mechanism does not affect the connections between OpenFlow switches and \gls{SDN} controller instances and that a failure of any given request router instance does not have impact on the load balancing service.
+The request router must then implement a clustering mechanism that allows the existence of several request router instances, in which active OpenFlow switch management connections are processed by any available request router instance, thus load balancing the connections between themselves such that request router instances do not become overloaded, and where any request router instance $\phi$ can take over the tasks performed by instance $\varphi$ should $\varphi$ fail.\\
 % Load Balancing the RR - Anycast
-To ensure that OpenFlow switch management connections to \gls{SDN} controller instances are load balanced between available request routers without requiring reconfiguration of the OpenFlow switches, request router instances implement the \gls{anycast} communication paradigm.
-By implementing \gls{anycast}, OpenFlow switches will connect to whichever request router instance is logically closer to them, and thus providing a mechanism to load balance OpenFlow switch management connections between request router instances.
+To ensure that OpenFlow switch management connections to \gls{SDN} controller instances are load balanced between available request routers, without requiring reconfiguration of the OpenFlow switches, request router instances implement the \gls{anycast} communication paradigm.
+By implementing \gls{anycast}, OpenFlow switches will connect to whichever request router instance is logically closer to them, thus providing a mechanism to load balance OpenFlow switch management connections between request router instances.
 % Local and Global LB
-Because large network topologies often span over several geographical locations and OpenFlow switches will connect to whichever request router is closer to them, request routers instances in the same request router cluster are allowed to have different forwarding rules so that OpenFlow switch management connections can be forwarded to the closest least-loaded or to the globally least-loaded \gls{SDN} cluster instance according to the network administrators preferences, thus resulting the in topology depicted in figure \ref{fig:Amorphous}.\\
+Because large network topologies often span over several geographical locations and OpenFlow switches will connect to whichever request router is closer to them, request routers instances in the same request router cluster are allowed to have different forwarding rules so that OpenFlow switch management connections can be forwarded to the closest least-loaded, or to the globally least-loaded \gls{SDN} cluster instance according to the network administrators preferences, thus resulting the in topology depicted in Figure \ref{fig:Amorphous}.\\
 %
 \begin{figure}
 	\centering
@@ -162,10 +162,10 @@ Because large network topologies often span over several geographical locations 
 \end{figure}
 %
 % How it works
-As mentioned in chapter \ref*{chapter:state-of-the-art} section \ref{section:openflow}, OpenFlow switches are required to maintain active \gls{TCP} or \gls{TLS} connections with the configured \gls{SDN} controller(s).
-Since we are now considering the topology represented in figure \ref{fig:Amorphous} and the description, we now consider that the all OpenFlow switches are configured to connect exclusively to the request router cluster, which in turn will forward the connection to an \gls{SDN} controller instance.
-The \gls{SDN} controller instance then replies directly to the OpenFlow switch, as portrayed in figure \ref{fig:rr_message_flow}.
-Having this behavior as opposed to having the \gls{SDN} controller instance reply back to the request router instance improves both performance and scalability as the latency for the response packets will be lower and it removes computational load from the request router instances, thus allowing them to handle more request packets.\\
-Because both \gls{TCP} and \gls{TLS} (which uses \gls{TCP} as its transport layer protocol\cite{rfc5246}) are connection oriented, request router instances must always forward packets coming from an OpenFlow switch to the same \gls{SDN} controller instance.
-Therefore, the request router must implement a deterministic destination selection for all packets coming from the same OpenFlow switch, such that any request router instance will forward the packets from switch $\alpha$ to the exact same \gls{SDN} controller instance $\beta$.
-Should $\beta$ become unavailable then request router instances are required to stop forwarding packets to $\beta$ and assign a new \gls{SDN} controller instance $\upsilon$ and forward all packets from $\alpha$ to $\upsilon$.
+As mentioned in Chapter \ref*{chapter:state-of-the-art} Section \ref{section:openflow}, OpenFlow switches are required to maintain active \gls{TCP} or \gls{TLS} connections with the configured \gls{SDN} controller(s).
+Considering the aforementioned specification of the request router, all OpenFlow switches must be configured to connect exclusively to the request router cluster, which will in turn forward the connection to an \gls{SDN} controller instance, as per the topology represented in Figure \ref{fig:Amorphous}.
+The \gls{SDN} controller instance then replies directly to the OpenFlow switch, as portrayed in Figure \ref{fig:rr_message_flow}.
+Having this behavior, as opposed to having the \gls{SDN} controller instance reply back to the request router instance, improves both performance and scalability as the latency for the response packets will be lower and it removes computational load from the request router instances, thus allowing them to handle more request packets.\\
+Because both \gls{TCP} and \gls{TLS} (which uses \gls{TCP} as its transport layer protocol \cite{rfc5246}) are connection oriented, request router instances must always forward packets coming from an OpenFlow switch to the same \gls{SDN} controller instance.
+Therefore, the request router must implement a deterministic destination selection for all packets coming from the same OpenFlow switch, such that any request router instance will forward the packets from switch $\rho$ to the exact same \gls{SDN} controller instance $\alpha$.
+Should $\alpha$ become unavailable then request router instances are required to stop forwarding packets to $\alpha$ and assign a new \gls{SDN} controller instance $\beta$ and forward all packets from $\rho$ to $\beta$.
