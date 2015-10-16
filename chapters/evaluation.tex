@@ -2,9 +2,9 @@
 
 \chapter{Evaluation}
 \label{chapter:evaluation}
-Ultimately the goal to be achieved by this work is an architecture for a network infrastructure that while solving existing manageability issues improves the overall performance of OpenFlow-based \gls{SDN} controllers operating in reactive mode.
+Ultimately the goal to be achieved by this work is an architecture for a network infrastructure that while solving existing manageability issues improves the scalability of OpenFlow-based \gls{SDN} controllers operating in reactive mode.
 This chapter reproduces the results obtained from various tests to which the proof of concept implementation described in chapter \ref{chapter:implementation} was subjected to in order to validate that the proposed architecture described in chapter \ref{chapter:architecture} met its objects.\\
-The scope of the testing ranges from strictly functional tests, in which the correctness of architectural model and of the implementation are validated, to performance tests using both the proof of concept implementation and the base Floodlight implementation.
+The scope of the testing ranges from strictly functional tests, in which the correctness of architectural model and of the implementation are validated, to some performance tests to the sample distributed policy application.
 %
 \section{Test environment}
 \label{section:test-environment}
@@ -13,7 +13,7 @@ This environment was composed of six \glspl{VM}, which where allocated for the f
 \begin{itemize}
 	\item \textbf{1 \gls{VM}} was allocated to execute the Mininet network emulator
 	\item \textbf{2 \glspl{VM}} were allocated to the execute the Request Router component described in chapter \ref*{chapter:state-of-the-art} section \ref{section:request-router} and chapter \ref*{chapter:implementation} section \ref{section:request-router-implementation}
-	\item \textbf{3 \glspl{VM}} were allocated to execute \gls{SDN} controller instances described in chapter \ref*{chapter:state-of-the-art} section \ref{section:SDN-controller-cluster} and chapter \ref*{chapter:implementation} section \ref{section:SDN-controller-cluster-implementation} as well as instances of version 1.1 of the Floodlight controller.
+	\item \textbf{3 \glspl{VM}} were allocated to execute \gls{SDN} controller instances described in chapter \ref*{chapter:state-of-the-art} section \ref{section:SDN-controller-cluster} and chapter \ref*{chapter:implementation} section \ref{section:SDN-controller-cluster-implementation}.
 \end{itemize}
 %
 The Operating System chosen to run in these \glspl{VM} was the version 8 of the Debian Linux distribution seeing that it provided a lightweight environment built on top of stable versions of the libraries required to execute the components supporting the implementation.\\
@@ -25,12 +25,16 @@ However, seeing that this implementation uses only proven components and protoco
 Because the test environment was restricted to a virtualized support, it was also necessary to provide a virtualized network testbed solution.\\
 Mininet is a network emulator written in python, that is capable of emulating switches and hosts in custom defined topologies, by employing process-based virtualization and making use of Linux's network namespaces \cite{mininet}.
 Because its emulated switches are able to support the OpenFlow protocol, Mininet is the network emulator of choice for \gls{SDN} testbeds.\\
-Version 2.2.1 of Mininet was used to emulate the different network topologies used in the tests described in this chapter.
+Version 2.2.1 of Mininet was used to emulate the topology in figure \ref{fig:network_topology}, which was used in the tests described in this chapter.
 %
-*TODO: Add diagrams of the network topologies used
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.70]{network_topology}
+	\caption{Typical datacenter topology}
+	\label{fig:network_topology}
+\end{figure}
 %
-%
-\section{Functional tests}
+\section{Elastic SDN controller cluster}
 \label{section:functional-tests}
 The first batch of tests carried out were functional tests, designed to validate the correctness of the implementation and the validity of the architecture.\\
 %
@@ -43,71 +47,125 @@ The validation of the correctness of the request router is validated with the re
 %
 \subsection{Scenarios}
 \label{subsection:functional-tests-scenarios}
-For the \gls{SDN} controller elastic cluster specific functional tests, the key points tested where as follows:
+For the \gls{SDN} controller elastic cluster specific functional tests, the scenarios to be tested are as follows:
 \begin{enumerate}
-	\item Cluster membership behavior and exchanged messages
-	\item Cluster membership consistency throughout the cluster upon membership changes
-	\item \gls{MIB} consistency throughout the cluster and exchanged messages
-	\item \gls{MIB} consistency throughout the cluster upon cluster membership changes
-	\item \gls{MIB} consistency throughout the cluster upon network topology changes
-	\item Network programming accuracy
+	\item Validate cluster membership behavior, consistency and exchanged messages. To do so the firstly two controller instances are to be initiated simultaneously and let them form a cluster while monitoring the network for exchanged messages. After convergence has been reached, a third controller instance is to be introduced and let it join the cluster while still monitoring the network for exchanged messages.
+	\item Validate \gls{MIB} consistency throughout the cluster and exchanged messages by manipulating the network topology to add, remove and simulate failure of OpenFlow switches and hosts as well as simulate switch management transference between available controller instances by provoking failure of cluster instances. The management network is to be monitored for exchanged messages throughout the tests.
+	\item Validate the correct programming of OpenFlow switches. This functionality is to be validated by means of executing the module implemented as described in chapter \ref*{chapter:implementation} section \ref{subsection:poc-application} to allow \gls{TCP} connections between Host 1 and Host 3 as well as between Host 4 and Host 5. 
 \end{enumerate}
 %
-For the request router specific functional tests, the key points tested where as follows:
+For the request router specific functional tests, the key points tested are as follows:
 \begin{enumerate}
-	\item Request router clustering and state replication
-	\item Integration with \gls{LVS} through the ipvsadm tool
-	\item Integration with the \gls{SDN} controller elastic cluster membership
-	\item Reconfiguration of \gls{LVS} through the ipvsadm tool upon controller elastic cluster membership
+	\item Validate request router clustering and state replication by having OpenFlow switches establish management connections to to the \gls{IPAddress} of the \gls{SDN} controller cluster and validating that both request router instances have the same connection state information.
+	\item Validate that the component developed as described in chapter \ref*{chapter:implementation} section \ref{subsection:elastic-cluster-integration-implementation} properly integrates with the \gls{SDN} cluster as well as with \gls{LVS}'s ipvsadm tool by provoking \gls{SDN} controller cluster membership changes.
 \end{enumerate}
-%
-%Preliminary tests of this experimental implementation show that the proposed architecture provides the desired functionalities.
-%These tests showed that the MIB is kept consistent throughout cluster members after adding, removing and provoking deliberate failures on controller instances as well as OpenFlow switches and request routers.
-%All the relevant network events (such as switch, host, links and adjacencies) are being detected, properly handled and triggering the appropriate message propagation to cluster members.
 %
 \subsection{Results}
 \label{section:functional-tests-results}
 %
-The following describe the results obtained for the \gls{SDN} controller elastic cluster specific functional tests:
-\begin{enumerate}
-	\item 
-	\item 
-	\item 
-	\item 
-	\item 
-	\item 
-\end{enumerate}
+The results obtained from the execution of the functional tests on the experimental implementation show that the proposed architecture provides the desired properties and moreover that the implementation's behavior is coherent with that of the Floodlight.
+Furthermore, the request router also complied with the specifications and expected implementation behavior.\\
 %
-The following describe the results obtained for the request router specific functional tests:
-\begin{enumerate}
-	\item 
-	\item 
-	\item 
-	\item 
-\end{enumerate}
+Through the execution of the functional tests for the \gls{SDN} controller elastic cluster, it was found that all relevant network events such as switch, host, links registration/de-registration as well as inter-switch adjacencies are being correctly and timely detected and properly handled to update the local \gls{MIB} and trigger appropriate messages to peer cluster members, which also update their \gls{MIB} accordingly.
+It was also confirmed that all messages described in table \ref{table:cluster-message-spec} within the scope of cluster membership and targeting the whole cluster are sent using multicast, therefore keeping the desired group communication properties described in chapter \ref*{chapter:architecture} section \ref{section:SDN-controller-cluster}.\\
 %
-\section{Perfomance tests}
+The functional tests to which the request router was subject to validated its correct behavior with the added feature of validating a Master/Master cluster instead of the predicted Master/Slave cluster as per \gls{LVS}'s documentation.
+%
+\section{Distributed network policy module tests}
 \label{section:performance-tests}
-For the \gls{SDN} controller elastic cluster specific performance tests, the key points tested where as follows:
-\begin{enumerate}
-	\item 
-\end{enumerate}
+The use-case scenario of a global policy application that was previously functionally tested was also subject to performance benchmarking.
+To that extent, the same scenario used to validate the correct programming of OpenFlow switches was also used to retrieve time metrics for the programming process.
 %
-For the request router specific performance tests, the key points tested where as follows:
-\begin{enumerate}
-	\item 
-\end{enumerate}
-%
-%
-\subsection{Scenarios}
-\label{subsection:performance-tests-scenarios}
-
+\subsection{Scenario}
+\label{subsection:performance-tests-scenario}
+Once again, this scenario specified the correct programming of the OpenFlow switches in order to allow for the establishment of \gls{TCP} connections between Host 1 and Host 3 as well as between Host 4 and Host 5.
+To fully test the capabilities, the Flow Entries were configured with matches for \gls{OSI} Layer 2, 3 and 4 source and destination fields as well as \gls{OSI} Layer 4 protocol number and physical port through which the traffic was being admitted into the network, coming to a total of 8 match fields per Flow Entry.\\
+Since the tests were performed using \gls{TCP} connections, bi-directionality is implied, which means that for every \gls{TCP} session opened there will be two Flow Entries programmed in each of the involved OpenFlow switches.
+For completeness purposes and in order to provide scalability metrics, these tests were performed using a two-instance controller cluster and repeated using a three-instance controller cluster, with OpenFlow switches evenly distributed among them by the request router component.
 %
 \subsection{Results}
 \label{subsection:performance-tests-results}
-
+%
+The results obtained are stated in tables \ref{table:perfomance-tests-2controllers} and \ref{table:perfomance-tests-2controllers} and summarized in figure \ref{fig:perfomance}.
+%
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.65]{perfomance}
+	\caption{Performance indicators for the distributed network policy module}
+	\label{fig:perfomance}
+\end{figure}
+%
+\begin{table}[h!]
+	\begin{center}
+		\rowcolors{2}{EvenRowColor}{OddRowColor}
+		\begin{tabular}{ | c | c | c | }
+			\rowcolor{HeaderRowColor}
+			\hline
+			\textbf{1 connection} & \textbf{5 Simultaneous connections} & \textbf{10 Simultaneous connections}\\
+			\hline
+			4 seconds & 28 seconds & 59 seconds\\
+			\hline
+			5 seconds & 26 seconds & 63 seconds\\
+			\hline
+			4 seconds & 29 seconds & 63 seconds\\
+			\hline
+			4 seconds & 29 seconds & 63 seconds\\
+			\hline
+			6 seconds & 28 seconds & 65 seconds\\
+			\hline
+			6 seconds & 28 seconds & 63 seconds\\
+			\hline
+			6 seconds & 29 seconds & 63 seconds\\
+			\hline
+			4 seconds & 29 seconds & 63 seconds\\
+			\hline
+			7 seconds & 30 seconds & 64 seconds\\
+			\hline
+		\end{tabular}
+		\caption{Flow programming results with a two-instance controller cluster}
+		\label{table:perfomance-tests-2controllers}
+	\end{center}
+\end{table}
+%
+\begin{table}[h!]
+	\begin{center}
+		\rowcolors{2}{EvenRowColor}{OddRowColor}
+		\begin{tabular}{ | c | c | c | }
+			\rowcolor{HeaderRowColor}
+			\hline
+			\textbf{1 connection} & \textbf{5 Simultaneous connections} & \textbf{10 Simultaneous connections}\\
+			\hline
+			4 seconds & 28 seconds & 59 seconds\\
+			\hline
+			5 seconds & 26 seconds & 63 seconds\\
+			\hline
+			4 seconds & 29 seconds & 63 seconds\\
+			\hline
+			4 seconds & 29 seconds & 63 seconds\\
+			\hline
+			6 seconds & 28 seconds & 65 seconds\\
+			\hline
+			6 seconds & 28 seconds & 63 seconds\\
+			\hline
+			6 seconds & 29 seconds & 63 seconds\\
+			\hline
+			4 seconds & 29 seconds & 63 seconds\\
+			\hline
+			7 seconds & 30 seconds & 64 seconds\\
+			\hline
+		\end{tabular}
+		\caption{Flow programming results with a two-instance controller cluster}
+		\label{table:perfomance-tests-3controllers}
+	\end{center}
+\end{table}
 %
 \section{Considerations}
 \label{section:considerations}
-* VMs running on uncontrolled hardware -> dont know how overloaded it is -> relative results
-* Interpret Functional and Performance results
+Due to Mininet's limitations, switches and hosts cannot be added or removed dynamically, however, they can be isolated from the network by shutting down all ports and in the particular case of switches removing configuration for controller connection.
+It is not evident however that this limitation impacted the tests in anyway.\\
+%
+The results obtained from the tests to the \gls{SDN} controller elastic cluster showed that both cluster membership and \gls{MIB} are kept consistent throughout cluster members after adding, removing and provoking deliberate failures on controller instances as well as OpenFlow switches.\\
+While the functional tests to both controller and request router implementations yielded positive results, the results obtained while benchmarking the distributed network policy application are unsatisfactory, which might be related to the overall load of the hardware supporting the test environment and to a poor implementation of \gls{TCP} unicast connections between controller instances, which instead of being cached for further communications are being opened and closed to send a single message. 
+It is noticeable however that the addition of a more \gls{SDN} controller instances to the cluster and consequent redistribution of the OpenFlow switches between them does not affect overall time required to execute the distributed flow programming.\\
+The global memory footprint of the controller instances appear to have suffered an increase of approximately $10\%$.
+ 

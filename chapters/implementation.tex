@@ -89,6 +89,7 @@ In order to implement the \gls{anycast} communication paradigm, it is assumed th
 The configuration of the network is not within the scope of this work.
 %
 \subsection{Linux Virtual Server (LVS)}
+\label{subsection:LVS-implementation}
 %TODO: Linux LVS
 The \gls{LVS} project, in particular the \gls{IPVS} module, provides an out of the box load balance facility for client-server applications connecting through the network and using the \gls{IPv4} stack.
 This module, implemented as a kernel module, introduces minimal overhead in the client-server communication and can be deployed as a cluster, in which mode forwarding states will be synchronized between cluster members, thus allowing for the required infrastructure resiliency seeing that a request router instance failure will not impact normal operation as its peer instance is able to take over the forwarding function seamlessly \cite{LVSSync}.\\
@@ -137,6 +138,7 @@ IPVS also offers a number of load balance algorithms that can be used to determi
 The optimal algorithm according to the requirements set for the request router would be the Source Hashing since it guarantees a deterministic load balancing decision, however, for the purposes of testing this implementation using a network emulator Least Connections was chosen instead seeing that the Source Hashing would always assign the same server since the source \gls{IPAddress} would always be the same for all OpenFlow switches (that of the emulator).
 %
 \subsection{Elastic Cluster Integration}
+\label{subsection:elastic-cluster-integration-implementation}
 %TODO: Request Router component (Multicast integration)
 The request router must integrate with the \gls{SDN} controller elastic cluster in order to determine the set of active controller instances to which it can forward OpenFlow switch connections.
 To do that, a new component was developed, much like the developed Floodlight module, joining also the same multicast group in order to receive Join messages through which it infers the active set of controller instances.
