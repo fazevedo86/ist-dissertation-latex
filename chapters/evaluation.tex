@@ -87,13 +87,13 @@ For completeness purposes and in order to provide scalability metrics, these tes
 \subsection{Results}
 \label{subsection:performance-tests-results}
 %
-The results obtained are stated in Tables \ref{table:perfomance-tests-2controllers} and \ref{table:perfomance-tests-2controllers} and summarized in Figure \ref{fig:perfomance}.
+The results obtained are stated in Tables \ref{table:perfomance-tests-2controllers} and \ref{table:perfomance-tests-2controllers} and summarized in Figure \ref{fig:performance}.
 %
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.65]{perfomance}
+	\includegraphics[scale=0.65]{performance_results.png}
 	\caption{Performance indicators for the distributed network policy module}
-	\label{fig:perfomance}
+	\label{fig:performance}
 \end{figure}
 %
 \begin{table}[h!]
@@ -104,23 +104,23 @@ The results obtained are stated in Tables \ref{table:perfomance-tests-2controlle
 			\hline
 			\textbf{1 connection} & \textbf{5 Simultaneous connections} & \textbf{10 Simultaneous connections}\\
 			\hline
-			4 seconds & 28 seconds & 59 seconds\\
+			6207 milliseconds & 6618 milliseconds & 11714 milliseconds \\
 			\hline
-			5 seconds & 26 seconds & 63 seconds\\
+			6209 milliseconds & 6414 milliseconds & 14918 milliseconds \\
 			\hline
-			4 seconds & 29 seconds & 63 seconds\\
+			4406 milliseconds & 6614 milliseconds & 11270 milliseconds \\
 			\hline
-			4 seconds & 29 seconds & 63 seconds\\
+			4406 milliseconds & 6410 milliseconds & 11709 milliseconds \\
 			\hline
-			6 seconds & 28 seconds & 65 seconds\\
+			6406 milliseconds & 6609 milliseconds & 14919 milliseconds \\
 			\hline
-			6 seconds & 28 seconds & 63 seconds\\
+			6406 milliseconds & 6414 milliseconds & 11705 milliseconds \\
 			\hline
-			6 seconds & 29 seconds & 63 seconds\\
+			6406 milliseconds & 6413 milliseconds & 10725 milliseconds \\
 			\hline
-			4 seconds & 29 seconds & 63 seconds\\
+			6006 milliseconds & 6213 milliseconds & 10738 milliseconds \\
 			\hline
-			7 seconds & 30 seconds & 64 seconds\\
+			6206 milliseconds & 6609 milliseconds & 11722 milliseconds \\
 			\hline
 		\end{tabular}
 		\caption{Flow programming results with a two-instance controller cluster}
@@ -136,26 +136,26 @@ The results obtained are stated in Tables \ref{table:perfomance-tests-2controlle
 			\hline
 			\textbf{1 connection} & \textbf{5 Simultaneous connections} & \textbf{10 Simultaneous connections}\\
 			\hline
-			7 seconds & 32 seconds & 63 seconds\\
+			6606 milliseconds & 6614 milliseconds & 6681 milliseconds \\
 			\hline
-			7 seconds & 32 seconds & 63 seconds\\
+			6406 milliseconds & 6614 milliseconds & 6678 milliseconds \\
 			\hline
-			6 seconds & 32 seconds & 63 seconds\\
+			6206 milliseconds & 6610 milliseconds & 10686 milliseconds \\
 			\hline
-			7 seconds & 32 seconds & 62 seconds\\
+			6406 milliseconds & 6614 milliseconds & 6682 milliseconds \\
 			\hline
-			7 seconds & 31 seconds & 64 seconds\\
+			6206 milliseconds & 6414 milliseconds & 6685 milliseconds \\
 			\hline
-			7 seconds & 31 seconds & 63 seconds\\
+			6206 milliseconds & 6614 milliseconds & 10686 milliseconds \\
 			\hline
-			7 seconds & 31 seconds & 63 seconds\\
+			6406 milliseconds & 6618 milliseconds & 6690 milliseconds \\
 			\hline
-			6 seconds & 32 seconds & 63 seconds\\
+			6406 milliseconds & 6609 milliseconds & 10698 milliseconds \\
 			\hline
-			6 seconds & 32 seconds & 63 seconds\\
+			6006 milliseconds & 6610 milliseconds & 7092 milliseconds \\
 			\hline
 		\end{tabular}
-		\caption{Flow programming results with a two-instance controller cluster}
+		\caption{Flow programming results with a three-instance controller cluster}
 		\label{table:perfomance-tests-3controllers}
 	\end{center}
 \end{table}
