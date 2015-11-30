@@ -12,7 +12,8 @@ A prototype of the load balance infrastructure was also implemented, using free 
 The global prototype implementation of the proposed architecture showed that it is able to provide a fully functional elastic controller cluster for \gls{SDN} applications, thus removing the limitations of OpenFlow's reactive programming when deployed in large networking environments.\\
 %
 Along with the implementation of the prototype a sample \gls{SDN} application was also developed in order to demonstrate the use of the architecture.
-Testing to this application showed that increasing the number of clustered controller instances and consequently partitioning the OpenFlow switches among them does not affect overall performance, further proving the desired scalability properties of the proposed architecture.\\
+Tests conducted to this applications showed that when network traffic increases and new \gls{SDN} controller instances are added to the cluster, a performance gain of 33$\%$ is attained, further proving the desired scalability properties of the proposed architecture.\\
 %
-Although the implementation described in this work served its purpose as a prototype, a more carefully developed solution that goes deeper into the controller core implementation will provide a considerable increase in performance.
-The standardization of the message set exchanged between controller instances pertaining to the same cluster and implementation as an Apllication layer protocol will make way for the existence of controller clusters composed of controller instances implemented in different languages and more fit to handle specific needs. 
+Although the implementation described in this work served its purpose as a prototype, a more carefully developed solution that goes deeper into the controller core implementation will provide a considerable increase in performance.\\
+%
+The standardization and extension of the message set exchanged between controller instances pertaining to the same cluster and implementation as an Apllication layer protocol will make way for the existence of controller clusters composed of controller instances implemented in different languages and more fit to handle specific needs.

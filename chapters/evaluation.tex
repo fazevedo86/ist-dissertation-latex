@@ -87,14 +87,7 @@ For completeness purposes and in order to provide scalability metrics, these tes
 \subsection{Results}
 \label{subsection:performance-tests-results}
 %
-The results obtained are stated in Tables \ref{table:perfomance-tests-2controllers} and \ref{table:perfomance-tests-2controllers} and summarized in Figure \ref{fig:performance}.
-%
-\begin{figure}
-	\centering
-	\includegraphics[scale=0.65]{performance_results.png}
-	\caption{Performance indicators for the distributed network policy module}
-	\label{fig:performance}
-\end{figure}
+The results obtained are stated in Tables \ref{table:perfomance-tests-2controllers} and \ref{table:perfomance-tests-3controllers} and plotted in Figure \ref{fig:performance}.
 %
 \begin{table}[h!]
 	\begin{center}
@@ -160,13 +153,20 @@ The results obtained are stated in Tables \ref{table:perfomance-tests-2controlle
 	\end{center}
 \end{table}
 %
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.65]{performance_results.png}
+	\caption{Performance indicators for the distributed network policy module}
+	\label{fig:performance}
+\end{figure}
+%
 \section{Analysis}
 \label{section:considerations}
 Due to Mininet's limitations, switches and hosts cannot be added or removed dynamically, however, they can be isolated from the network by shutting down all ports and in the particular case of switches removing configuration for controller connection.
 It is not evident however that this limitation impacted the tests in anyway.\\
 %
 The results obtained from the tests to the \gls{SDN} controller elastic cluster showed that both cluster membership and \gls{MIB} are kept consistent throughout cluster members after adding, removing and provoking deliberate failures on controller instances as well as OpenFlow switches.\\
-While the functional tests to both controller and request router implementations yielded positive results, the results obtained while benchmarking the distributed network policy application are unsatisfactory, which might be related to the overall load of the hardware supporting the test environment and to a poor implementation of \gls{TCP} unicast connections between controller instances, which instead of being cached for further communications are being opened and closed to send a single message. 
-It is noticeable however that the addition of more \gls{SDN} controller instances to the cluster and consequent redistribution of the OpenFlow switches between them does not affect the overall time required to execute the distributed flow programming.\\
-The global memory footprint of the controller instances appear to have suffered an increase of approximately $10\%$.
- 
+%
+The results obtained while benchmarking the distributed network policy application also yielded positive results, showing that it is already possible to have a 33$\%$ efficiency increase by adding a third \gls{SDN} controller instance to the cluster when there are more than 10 concurrent \gls{TCP} sessions traversing the controlled network, thus achieving the desired scalability property.
+However, if we take into account the absolute time required for the completion of flow configuration operations, the results obtained are unsatisfactory, which might be related to factors such as the overall load of the hardware supporting the test environment, virtualization overhead, network emulation environment overhead and finally to a suboptimal implementation of \gls{TCP} unicast connections between controller instances, which instead of caching connections between \gls{SDN} Controller instances for further communications are being opened and closed to send a single message.\\
+The global memory footprint of the controller instances appear to have suffered an increase of approximately $10\%$ when executing the prototype Floodlight module.

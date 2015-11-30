@@ -16,7 +16,7 @@
 \fi
 
 \begin{center}
-\if\IsFinalVersion 0
+\if\IsFinalVersion 1
 \vspace*{1.5cm}
 \fi
 % ---------------------------------------------------------
@@ -29,9 +29,12 @@
 % ---------------------------------------------------------
 %  AUTHOR NAME (FULL)
 % ---------------------------------------------------------
+\if\IsFinalVersion 1
+\vspace*{0.3cm}
+\fi
 {\Large \textbf{\StudentName}}\\[1.0cm]
-\if\IsFinalVersion 0
-\vspace*{0.2cm}
+\if\IsFinalVersion 1
+\vspace*{0.3cm}
 \fi
 % ---------------------------------------------------------
 %  DISSERTATION DEGREE
@@ -44,16 +47,16 @@
 % -----------------------------------------------------------------
 %  ADVISORS NAME
 % ---------------------------------------------------------
-\begin{minipage}[t]{.5\textwidth}
-  \begin{flushright}
-    {\large Advisor(s):\:}
-  \end{flushright}
-\end{minipage}%
-\begin{minipage}[t]{.5\textwidth}
-  \begin{flushleft}
-    {\Supervisors}
-  \end{flushleft}
-\end{minipage}\\
+%\begin{minipage}[t]{.5\textwidth}
+%  \begin{flushright}
+    {\large Supervisors:\:}
+%\end{flushright}
+%\end{minipage}%
+%\begin{minipage}[t]{.5\textwidth}
+%  \begin{flushleft}
+    {\Supervisors}\\
+%  \end{flushleft}
+%\end{minipage}\\
 %
 \if\IsFinalVersion 1
   \vspace*{\finalAdvisorsSpacing}
@@ -68,35 +71,34 @@
 % ---------------------------------------------------------
 \if\IsFinalVersion 1
 %
+\vspace*{1.2cm}
 {\Large \textbf{Examination Committee}}\\[.25cm]
-\begin{minipage}[t]{.5\textwidth}
-  \begin{flushright}
+%\begin{minipage}[t]{.5\textwidth}
+%  \begin{flushright}
     \if\IsFinalVersion 1
-    {\large Chairperson:\:}\\
-    \fi
-    {\large Advisor:\:}\\
-    \if\HasCoAdvisor 1
-    {\large Co-Advisor:}\\
-    \fi
-    \if\IsFinalVersion 1
-    {\large Members of the Committee:\:}
-    \fi
-  \end{flushright}
-\end{minipage}%
-\begin{minipage}[t]{.5\textwidth}
-  \begin{flushleft}
-    \if\IsFinalVersion 1
+    {\large Chairperson:\:}
     {\Chairperson}\\
     \fi
-    {\Advisor}\\
-    \if\HasCoAdvisor 1
-    {\CoAdvisor}\\
-    \fi
+    {\large Supervisor:\:}
+    {\Advisor}
+%    \hfill \break
     \if\IsFinalVersion 1
+    {\large Member of the Committee:\:}
     {\CommitteeMembers}
     \fi
-  \end{flushleft}
-\end{minipage}\\[1.0cm]
+%  \end{flushright}
+%\end{minipage}%
+%\begin{minipage}[t]{.5\textwidth}
+%  \begin{flushleft}
+%    \if\IsFinalVersion 1
+%    {\Chairperson}\\
+%    \fi
+%    {\Advisor}
+%    \if\IsFinalVersion 1
+%    {\CommitteeMembers}
+%    \fi
+%  \end{flushleft}
+%\end{minipage}\\[1.0cm]
 %
 \fi
 
